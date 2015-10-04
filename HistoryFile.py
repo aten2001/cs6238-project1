@@ -1,32 +1,49 @@
 import shelve
+import Config
+from collections import deque
 
 BASE_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)),
                          "data")
+
+config = Config.getConfig()
 
 class HistoryFile(object):
 
     def __init__(self, username, password):
         self.username = username
         self.password = password
-        self.historyFile = self.getHistoryFile()
+        self.history = self.getHistory()
     
-    def encrypt(self, password):
-        pass
+    def encrypt(self, featurearray):
+        # TODO: encrypt with password
+        return featurearray
 
-    def decrypt(self, password):
-        pass
+    def decrypt(self, featurearray):
+        # TODO: decrypt with password
+        return featurearray
 
-    def getHistoryFile(self):
-        shelf = shelve.open(os.path.join(BASE_PATH, self.username,
-                    writeback=True))
+    def getHistory(self):
+        shelf = shelve.open(os.path.join(BASE_PATH, self.username))
         try:
-            featurearray = shelf["featurearray"]
+            history = shelf["history"]
         except KeyError:
-            shelf["featurearray"] = []
-
+            history = []
+        finally:
+            shelf.close()
+            return history
 
     def addEntry(self, featureArray):
-        # Check if 5 entries
-        ## If not add entry
-        ## Else remove first entry; add entry
-        pass
+        length = config.get("historyfile", "length")
+        shelf = shelve.open(os.path.join(BASE_PATH, self.username))
+        try:
+            history = shelf["history"]
+        except KeyError:
+            history = deque([])
+        finally:
+            if len(history) < length:
+                history.append(self.encrypt(featureArray))
+            else:
+                for i in range(0, (len(history) - length) + 1):
+                    temp = queue.popleft()
+                history.append(self.encrypt(featureArray))
+                shelf["history"] = history
