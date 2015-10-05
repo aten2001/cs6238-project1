@@ -23,7 +23,7 @@ class HistoryFile(object):
         self.salt = salt
         self.token = self.tokenFromPassword()
         self.history = self.read()
-    
+
     def tokenFromPassword(self):
         kdf = PBKDF2HMAC(
                 algorithm=hashes.SHA256(),

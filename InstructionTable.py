@@ -13,7 +13,7 @@ class InstructionTable(object):
         table = []
         # TODO: add in G
         for i in range(1, degree + 1):
-            table.append([i, 
+            table.append([i,
                           self.polynomial(self.coefficients, 2 * i),
                           self.polynomial(self.coefficients, 2 * i + 1)])
         return table
