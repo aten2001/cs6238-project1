@@ -1,6 +1,6 @@
 import base64
 import os
-import shelve
+import pickle
 import Config
 import cryptography
 from collections import deque
@@ -54,7 +54,7 @@ class HistoryFile(object):
                 plaintext = fern.decrypt(cipher)
                 # TODO: Unpad file
                 # Unpickle array
-                array = pickle.loads(plaintext)
+                queue = pickle.loads(plaintext)
                 # Return array
                 return queue
         else:

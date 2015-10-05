@@ -6,9 +6,9 @@ def getConfig():
                              "config")
 
     try:
-        with open(os.path.join(BASE_PATH, "default.conf")) as f:
+        with open(os.path.join(BASE_PATH, "default.conf"), "r") as f:
             parser = ConfigParser.SafeConfigParser()
-            parser.read(f)
+            parser.readfp(f)
             return parser
     except IOError:
         # TODO: change to raise error about there being no config
