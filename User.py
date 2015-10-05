@@ -14,11 +14,12 @@ class User(object):
         self.username = username
         self.q = Crypto.Util.number.getPrime(160)
         self.hpwd = random.randint(1, self.q)
+        self.salt = os.urandom(16)
         self.historyfile = self.getHistoryFile()
         self.passwd = password
 
     def getHistoryFile(self):
-        return HistoryFile(self.username, self.password)
+        return HistoryFile(self.username, self.password, self.salt)
 
     def saveHistFile(self):
         pass
