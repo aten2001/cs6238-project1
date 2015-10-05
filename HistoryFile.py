@@ -20,8 +20,8 @@ class HistoryFile(object):
     def __init__(self, username, password, salt):
         self.username = username
         self.password = password
-        self.token = tokenFromPassword(self)
         self.salt = salt
+        self.token = self.tokenFromPassword()
         self.history = self.read()
     
     def tokenFromPassword(self):
@@ -58,7 +58,7 @@ class HistoryFile(object):
                 # Return array
                 return queue
         else:
-            return dequeue([])
+            return deque([])
 
     def write(self, queue):
         # Pickle the queue
