@@ -39,8 +39,9 @@ class HistoryFile(object):
         length = config.get("historyfile", "length")
         if len(self.history) >= length:
             for i in range(0, (len(self.history) - length) + 1):
-                temp = history.popleft()
-        history.append(featureArray)
+                temp = self.history.popleft()
+        self.history.append(featureArray)
+        self.write(self.history)
 
     def read(self):
         # Read in file if exists
