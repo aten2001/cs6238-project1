@@ -22,7 +22,7 @@ class HistoryFile(object):
         self.password = password
         self.token = tokenFromPassword(self)
         self.salt = salt
-        self.history = self.getHistory()
+        self.history = self.read()
     
     def tokenFromPassword(self):
         kdf = PBKDF2HMAC(
@@ -35,54 +35,37 @@ class HistoryFile(object):
         token = base64.urlsafe_b64encode(kdf.derive(self.password))
         return token
 
-    def encrypt(self):
-        # TODO: encrypt with password
-        pass
-
-    def decrypt(self):
-        # TODO: decrypt with password
-        pass
-
-    def getHistory(self):
-        shelf = shelve.open(os.path.join(BASE_PATH, self.username))
-        try:
-            history = shelf["history"]
-        except KeyError:
-            history = []
-        finally:
-            shelf.close()
-            return history
-
     def addEntry(self, featureArray):
         length = config.get("historyfile", "length")
-        shelf = shelve.open(os.path.join(BASE_PATH, self.username))
-        try:
-            history = shelf["history"]
-        except KeyError:
-            history = deque([])
-        finally:
-            if len(history) < length:
-                history.append(self.encrypt(featureArray))
-            else:
-                for i in range(0, (len(history) - length) + 1):
-                    temp = queue.popleft()
-                history.append(self.encrypt(featureArray))
-                shelf["history"] = history
+        if len(self.history) >= length:
+            for i in range(0, (len(self.history) - length) + 1):
+                temp = history.popleft()
+        history.append(featureArray)
 
-    def open(self):
-        # Read in file
-        with open(os.path.join(BASE_PATH, self.username)) as f:
-            # Decrypt file w/ password
-            fern = Fernet(self.token)
-            cipher = f.read()
-            plaintext = fern.decrypt(cipher)
-            # TODO: Unpad file
-            # Unpickle array
-            # Return array
+    def read(self):
+        # Read in file if exists
+        HISTFILE = os.path.join(BASE_PATH, self.username)
+        if os.path.isfile(HISTFILE):
+            with open(HISTFILE, "rb") as f:
+                # Decrypt file w/ password
+                fern = Fernet(self.token)
+                cipher = f.read()
+                plaintext = fern.decrypt(cipher)
+                # TODO: Unpad file
+                # Unpickle array
+                array = pickle.loads(plaintext)
+                # Return array
+                return queue
+        else:
+            return dequeue([])
 
-    def write(self, array):
-        # Pickle array
-        # Pad array
-        # Encrypt array w/ password
+    def write(self, queue):
+        # Pickle the queue
+        pickledQueue = pickle.dumps(queue)
+        # TODO: Pad queue
+        # Encrypt queue w/ password
+        fern = Fernet(self.token)
+        cipher = fern.encrypt(pickledQueue)
         # Write to file
-        pass
+        with open(os.path.join(BASE_PATH, self.username), "wb") as f:
+            f.write(cipher)
