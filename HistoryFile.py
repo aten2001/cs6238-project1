@@ -3,6 +3,7 @@ import os
 import pickle
 import Config
 import cryptography
+import helpers
 from collections import deque
 from cryptography.fernet import Fernet
 from cryptography.hazmat.backends import default_backend
@@ -32,7 +33,8 @@ class HistoryFile(object):
                 iterations=100000,
                 backend=default_backend()
               )
-        token = base64.urlsafe_b64encode(kdf.derive(self.password))
+        token = base64.urlsafe_b64encode(
+                  kdf.derive(helpers.long_to_bytes(self.password)))
         return token
 
     def addEntry(self, featureArray):
