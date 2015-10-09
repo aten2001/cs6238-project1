@@ -26,7 +26,7 @@ class User(object):
         pass
 
     def genPolynomial(self):
-        degree = config.get("general", "features") - 1
+        degree = int(config.get("general", "features")) - 1
         a = [self.hpwd]
         for i in range(0, degree):
             a.append(Crypto.Random.random.randint(1, self.q))
