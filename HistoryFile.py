@@ -29,6 +29,7 @@ class HistoryFile(object):
             try:
                 self.history = self.decrypt(history)
             except cryptography.fernet.InvalidToken:
+                # TODO: raise error
                 return None
 
     def tokenFromPassword(self):

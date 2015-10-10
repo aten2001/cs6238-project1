@@ -19,8 +19,11 @@ class User(object):
         self.historyfile = self.getHistoryFile()
         self.polynomial = self.genPolynomial()
 
-    def getHistoryFile(self):
-        return HistoryFile.HistoryFile(self.username, self.hpwd, self.salt)
+    def getHistoryFile(self, blob=None):
+        if blob == None:
+            return HistoryFile.HistoryFile(self.hpwd, self.salt)
+        else:
+            return HistoryFile.HistoryFile(self.hpwd, self.salt, blob)
 
     def saveHistFile(self):
         pass
