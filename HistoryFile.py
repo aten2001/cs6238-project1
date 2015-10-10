@@ -18,12 +18,18 @@ config = Config.getConfig()
 
 class HistoryFile(object):
 
-    def __init__(self, username, password, salt):
-        self.username = username
+    def __init__(self, password, salt, history=None):
         self.password = password
         self.salt = salt
         self.token = self.tokenFromPassword()
-        self.history = self.read()
+        
+        if history == None:
+            self.history = deque([])
+        else:
+            try:
+                self.history = self.decrypt(history)
+            except cryptography.fernet.InvalidToken:
+                return None
 
     def tokenFromPassword(self):
         kdf = PBKDF2HMAC(
@@ -43,32 +49,16 @@ class HistoryFile(object):
             for i in range(0, (len(self.history) - length) + 1):
                 temp = self.history.popleft()
         self.history.append(featureArray)
-        self.write(self.history)
 
-    def read(self):
-        # Read in file if exists
-        HISTFILE = os.path.join(BASE_PATH, self.username)
-        if os.path.isfile(HISTFILE):
-            with open(HISTFILE, "rb") as f:
-                # Decrypt file w/ password
-                fern = Fernet(self.token)
-                cipher = f.read()
-                plaintext = fern.decrypt(cipher)
-                # TODO: Unpad file
-                # Unpickle array
-                queue = pickle.loads(plaintext)
-                # Return array
-                return queue
-        else:
-            return deque([])
-
-    def write(self, queue):
-        # Pickle the queue
-        pickledQueue = pickle.dumps(queue)
-        # TODO: Pad queue
-        # Encrypt queue w/ password
+    def encrypt(self):
+        pickledQueue = pickle.dumps(self.history)
+        # TODO: pad queue
         fern = Fernet(self.token)
         cipher = fern.encrypt(pickledQueue)
-        # Write to file
-        with open(os.path.join(BASE_PATH, self.username), "wb") as f:
-            f.write(cipher)
+        return cipher
+
+    def decrypt(self, history):
+        fern = Fernet(self.token)
+        plaintext = fern.decrypt(history)
+        queue = pickle.loads(plaintext)
+        return queue
