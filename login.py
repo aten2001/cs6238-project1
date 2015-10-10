@@ -4,6 +4,7 @@ import getpass
 import shelve
 import pickle
 import Config
+import os
 
 config = Config.getConfig()
 
@@ -33,19 +34,20 @@ def getUser(username):
     shelf = shelve.open(SHELF_FILE)
 
     try:
-        user = shelf["users"][username]
+        pickled_user, enc_history = shelf["users"][username]
+        user = pickle.loads(pickled_user)
     except KeyError:
         user = None
     finally:
         shelf.close()
-        return user
+        return user, enc_history
 
 def storeUser(user):
-    shelf = shelve.open(SHELF_FILE)
+    shelf = shelve.open(SHELF_FILE, writeback=True)
 
     if not shelf.has_key("users"):
         shelf["users"] = {}
-    hist = user.HistoryFile.encrypt()
+    hist = user.historyfile.encrypt()
     user.HistoryFile = None
     user.hpwd = None
     shelf["users"][user.username] = (pickle.dumps(user), hist)
