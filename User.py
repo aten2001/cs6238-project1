@@ -1,6 +1,7 @@
 import Crypto.Util.number
 import Crypto.Random.random
 import os
+import helpers
 import HistoryFile
 import InstructionTable
 import Config
@@ -36,3 +37,28 @@ class User(object):
         for i in range(0, degree):
             a.append(Crypto.Random.random.randint(1, self.q))
         return a
+
+    def deriveHpwd(self, featureArray):
+        backend = default_backend()
+        kdf = PBKDF2HMAC(
+                algorithm=hashes.SHA256(),
+                length=32,
+                salt=self.salt,
+                iterations=100000,
+                backend=backend
+              )
+
+        G = long(kdf.derive(self.password).encode('hex'),16)
+
+        ti = int(config.get("general", "ti"))
+        points = []
+        i = 0
+        for feature in featureArray:
+            if feature < ti:
+                points.append([self.instructiontable[i][0] * 2,
+                               self.instructiontable[i][1] - G % q])
+            else:
+                points.append([self.instructiontable[i][0] * 2 + 1,
+                               self.instructiontable[i][2] - G % q])
+        hpwd = helpers.modular_lagrange_interpolation(0, points, self.q)
+        return hpwd
