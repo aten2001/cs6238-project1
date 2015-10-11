@@ -45,7 +45,7 @@ class InstructionTable(object):
 
         y = self.polynomial(2 * i)
 
-        G = long(kdf.derive(password).encode('hex'),16)
+        G = long(kdf.derive(self.password).encode('hex'),16)
         alpha = y + G % self.q
         return alpha
 
@@ -61,6 +61,6 @@ class InstructionTable(object):
 
         y = self.polynomial(2 * i + 1)
 
-        G = long(kdf.derive(password).encode('hex'),16)
+        G = long(kdf.derive(self.password).encode('hex'),16)
         beta = y + G % self.q
         return beta
