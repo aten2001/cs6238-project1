@@ -18,15 +18,16 @@ class User(object):
         self.password = password # TODO: hash this
         self.historyfile = self.getHistoryFile()
         self.polynomial = self.genPolynomial()
+        self.instructiontable = InstructionTable.InstructionTable(
+                                    self.polynomial,
+                                    self.q,
+                                    self.password)
 
     def getHistoryFile(self, blob=None):
         if blob == None:
             return HistoryFile.HistoryFile(self.hpwd, self.salt)
         else:
             return HistoryFile.HistoryFile(self.hpwd, self.salt, blob)
-
-    def saveHistFile(self):
-        pass
 
     def genPolynomial(self):
         degree = int(config.get("general", "features")) - 1
