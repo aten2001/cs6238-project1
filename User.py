@@ -2,6 +2,7 @@ import Crypto.Util.number
 import Crypto.Random.random
 import os
 import HistoryFile
+import InstructionTable
 import Config
 
 config = Config.getConfig()
