@@ -1,4 +1,5 @@
 import User
+import helpers
 import argparse
 import getpass
 import shelve
@@ -57,15 +58,6 @@ def storeUser(user):
 
     shelf.close()
 
-def read_2_lines(f):
-    for line in f:
-        try:
-            line2 = f.next()
-        except StopIteration:
-            line2 = ''
-
-        yield line[:-1], line2[:-1]
-
 if __name__ == "__main__":
     parser = getParser()
     args = parser.parse_args()
@@ -80,6 +72,6 @@ if __name__ == "__main__":
     else:
         logins = []
         with open(args["file"], "r") as f:
-            for password, features in read_2_lines(f):
+            for password, features in helpers.read_2_lines(f):
                 logins.append((password, features))
         # For each pw and feature array try to auth

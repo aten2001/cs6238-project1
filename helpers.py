@@ -33,3 +33,12 @@ def long_to_bytes (val, endianness='big'):
         s = s[::-1]
 
     return s
+
+def read_2_lines(f):
+    for line in f:
+        try:
+            line2 = f.next()
+        except StopIteration:
+            line2 = ''
+
+        yield line[:-1], line2[:-1]
