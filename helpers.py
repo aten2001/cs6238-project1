@@ -42,3 +42,24 @@ def read_2_lines(f):
             line2 = ''
 
         yield line[:-1], line2[:-1]
+
+def modular_lagrange_interpolation(x, points, prime):
+    # break the points up into lists of x and y values
+    x_values, y_values = zip(*points)
+    # initialize f(x) and begin the calculation: f(x) = SUM( y_i * l_i(x) )
+    f_x = long(0)
+    for i in range(len(points)):
+        # evaluate the lagrange basis polynomial l_i(x)
+        numerator, denominator = 1, 1
+        for j in range(len(points)):
+            # don't compute a polynomial fraction if i equals j
+            if i == j:
+                continue
+            # compute a fraction & update the existing numerator + denominator
+            numerator = (numerator * (x - x_values[j])) % prime
+            denominator = (denominator * (x_values[i] - x_values[j])) % prime
+        # get the polynomial from the numerator + denominator mod inverse
+        lagrange_polynomial = numerator * mod_inverse(denominator, prime)
+        # multiply the current y & the evaluated polynomial & add it to f(x)
+        f_x = (prime + f_x + (y_values[i] * lagrange_polynomial)) % prime
+    return f_x
