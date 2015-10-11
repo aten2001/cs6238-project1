@@ -63,3 +63,11 @@ def modular_lagrange_interpolation(x, points, prime):
         # multiply the current y & the evaluated polynomial & add it to f(x)
         f_x = (prime + f_x + (y_values[i] * lagrange_polynomial)) % prime
     return f_x
+
+def mod_inverse(k, prime):
+    k = k % prime
+    if k < 0:
+        r = egcd(prime, -k)[2]
+    else:
+        r = egcd(prime, k)[2]
+    return (prime + r) % prime
