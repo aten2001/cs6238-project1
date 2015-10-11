@@ -1,3 +1,6 @@
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives import hashes, hmac
+from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 import Crypto.Util.number
 import Crypto.Random.random
 import os
@@ -39,6 +42,7 @@ class User(object):
         return a
 
     def deriveHpwd(self, featureArray):
+        table = self.instructiontable.generateTable()
         backend = default_backend()
         kdf = PBKDF2HMAC(
                 algorithm=hashes.SHA256(),
@@ -55,10 +59,10 @@ class User(object):
         i = 0
         for feature in featureArray:
             if feature < ti:
-                points.append([self.instructiontable[i][0] * 2,
-                               self.instructiontable[i][1] - G % q])
+                points.append([table[i][0] * 2,
+                               table[i][1] - G % self.q])
             else:
-                points.append([self.instructiontable[i][0] * 2 + 1,
-                               self.instructiontable[i][2] - G % q])
+                points.append([table[i][0] * 2 + 1,
+                               table[i][2] - G % self.q])
         hpwd = helpers.modular_lagrange_interpolation(0, points, self.q)
         return hpwd
