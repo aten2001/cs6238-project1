@@ -71,3 +71,10 @@ def mod_inverse(k, prime):
     else:
         r = egcd(prime, k)[2]
     return (prime + r) % prime
+
+def egcd(a, b):
+    if a == 0:
+        return (b, 0, 1)
+    else:
+        g, y, x = egcd(b % a, a)
+        return (g, x - (b // a) * y, y)
