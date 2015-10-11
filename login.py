@@ -20,11 +20,14 @@ def getParser():
     group.add_argument('--create', action = store_true, default = False,
                         help = "Create a user.")
     group.add_argument('file', help = "Path to login file.")
+    parser.add_argument('--user', '-u', help = "Name of user to create \
+                                                or login.")
 
     return parser
 
-def createUser():
-    username = raw_input("Username: ")
+def createUser(username=None):
+    if username == None:
+        username = raw_input("Username: ")
     password = getpass.getpass()
     user = User.User(username, password)
 
@@ -54,18 +57,29 @@ def storeUser(user):
 
     shelf.close()
 
+def read_2_lines(f):
+    for line in f:
+        try:
+            line2 = f.next()
+        except StopIteration:
+            line2 = ''
+
+        yield line[:-1], line2[:-1]
+
 if __name__ == "__main__":
     parser = getParser()
     args = parser.parse_args()
     args = vars(args)
 
     if args["create"]:
-        user = createUser()
+        if args["user"]:
+            user = createUser(username=args["user"])
+        else:
+            user = createUser()
         storeUser(user)
-
     else:
-        with open(args["file"], "r"):
-            # Read lines from file
-            # For each pw and feature array try to auth
-            pass
-        pass
+        logins = []
+        with open(args["file"], "r") as f:
+            for password, features in read_2_lines(f):
+                logins.append((password, features))
+        # For each pw and feature array try to auth
