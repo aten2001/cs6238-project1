@@ -12,14 +12,14 @@ class InstructionTable(object):
         self.q = q
         self.coefficients = coefficients
         self.password = password
-        self.salt = os.urandom(16) 
+        self.salt = os.urandom(16)
 
     def generateTable(self):
         degree = config.get("general", "features")
         table = []
-        for i in range(1, degree + 1):
-            alpha = getAlpha(i)
-            beta = getBeta(i)
+        for i in range(1, int(degree) + 1):
+            alpha = self.genAlpha(i)
+            beta = self.genBeta(i)
             table.append([i,
                           alpha,
                           beta])
@@ -43,9 +43,9 @@ class InstructionTable(object):
                 backend=backend
               )
 
-        y = self.polynomial(self.coefficients, 2 * i)
+        y = self.polynomial(2 * i)
 
-        G = long(kdf.derive('hex'),16)
+        G = long(kdf.derive('hex').encode('hex'),16)
         alpha = y + G % self.q
         return alpha
 
@@ -59,8 +59,8 @@ class InstructionTable(object):
                 backend=backend
               )
 
-        y = self.polynomial(self.coefficients, 2 * i + 1)
+        y = self.polynomial(2 * i + 1)
 
-        G = long(kdf.derive('hex'),16)
+        G = long(kdf.derive('hex').encode('hex'),16)
         beta = y + G % self.q
         return beta
