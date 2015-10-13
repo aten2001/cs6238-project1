@@ -10,6 +10,7 @@ from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 from cryptography.hazmat.primitives import padding
+from PasswordError import PasswordError
 
 BASE_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)),
                          "data")
@@ -30,7 +31,7 @@ class HistoryFile(object):
                 self.history = self.decrypt(history)
             except cryptography.fernet.InvalidToken:
                 # TODO: raise error
-                return None
+                raise PasswordError("Incorrect Password")
 
     def tokenFromPassword(self):
         kdf = PBKDF2HMAC(

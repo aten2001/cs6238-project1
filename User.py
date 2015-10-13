@@ -26,13 +26,14 @@ class User(object):
         self.instructiontable = InstructionTable.InstructionTable(
                                     self.polynomial,
                                     self.q,
-                                    self.password)
+                                    self.password,
+                                    self.salt)
 
     def getHistoryFile(self, blob=None):
         if blob == None:
             return HistoryFile.HistoryFile(self.hpwd, self.salt)
         else:
-            return HistoryFile.HistoryFile(self.hpwd, self.salt, blob)
+            return HistoryFile.HistoryFile(self.hpwd, self.salt, history=blob)
 
     def genPolynomial(self):
         degree = int(config.get("general", "features")) - 1
@@ -64,5 +65,6 @@ class User(object):
             else:
                 points.append([table[i][0] * 2 + 1,
                                table[i][2] - G % self.q])
+            i += 1
         hpwd = helpers.modular_lagrange_interpolation(0, points, self.q)
         return hpwd

@@ -8,11 +8,11 @@ config = Config.getConfig()
 
 class InstructionTable(object):
 
-    def __init__(self, coefficients, q, password):
+    def __init__(self, coefficients, q, password, salt):
         self.q = q
         self.coefficients = coefficients
         self.password = password
-        self.salt = os.urandom(16)
+        self.salt = salt
 
     def generateTable(self):
         degree = config.get("general", "features")

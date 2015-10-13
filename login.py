@@ -82,17 +82,18 @@ if __name__ == "__main__":
                 user, enc_history = getUser(args["user"])
                 if user == None:
                     user = createUser(args["user"])
+                    storeUser(user)
                 if password != user.password:
                     print "Password ({0}) does not match {1}".format(
                             password, user.password)
                     print 0
                 else:
-                    user.historyfile = user.getHistoryFile(enc_history)
                     user.hpwd = user.deriveHpwd(features)
+                    user.historyfile = user.getHistoryFile(enc_history)
                     login = True
                     print "Password matches"
                     if login:
-                        user.HistoryFile.addEntry(features)
+                        user.historyfile.addEntry(features)
                         storeUser(user)
         else:
             print "Must specify login file name"
