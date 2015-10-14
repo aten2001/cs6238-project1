@@ -59,7 +59,7 @@ class User(object):
         points = []
         i = 0
         for feature in featureArray:
-            if feature < ti:
+            if int(feature) < ti:
                 points.append([table[i][0] * 2,
                                table[i][1] - G % self.q])
             else:
