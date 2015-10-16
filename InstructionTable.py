@@ -29,10 +29,10 @@ class InstructionTable(object):
         for i in range(1, int(degree) + 1):
             alpha = self.genAlpha(i)
             beta = self.genBeta(i)
-            if not mean:
-                if math.abs(mean - int(ti)) > k * stdev:
+            if mean != None:
+                if abs(mean - int(ti)) > k * stdev:
                     beta += Crypto.Random.random.randint(1, self.q) % self.q
-                elif math.abs(mean - int(ti)) < k * stdev:
+                elif abs(mean - int(ti)) < k * stdev:
                     alpha += Crypto.Random.random.randint(1, self.q) % self.q
             table.append([i,
                           alpha,
