@@ -27,7 +27,7 @@ class User(object):
                                     self.polynomial,
                                     self.q,
                                     self.password,
-                                    self.salt)
+                                    self.salt, self.historyfile.history)
 
     def getHistoryFile(self, blob=None):
         if blob == None:
@@ -59,7 +59,7 @@ class User(object):
         points = []
         i = 0
         for feature in featureArray:
-            if feature < ti:
+            if int(feature) < ti:
                 points.append([table[i][0] * 2,
                                table[i][1] - G % self.q])
             else:
