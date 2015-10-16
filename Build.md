@@ -2,3 +2,4 @@
 ## Python Modules
 pycrypto
 cryptography
+statistics
