@@ -3,16 +3,18 @@ from cryptography.hazmat.primitives import hashes, hmac
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 import Config
 import os
+import statistics
 
 config = Config.getConfig()
 
 class InstructionTable(object):
 
-    def __init__(self, coefficients, q, password, salt):
+    def __init__(self, coefficients, q, password, salt, history):
         self.q = q
         self.coefficients = coefficients
         self.password = password
         self.salt = salt
+        self.history = history
 
     def generateTable(self):
         degree = config.get("general", "features")
@@ -64,3 +66,11 @@ class InstructionTable(object):
         G = long(kdf.derive(self.password).encode('hex'),16)
         beta = y + G % self.q
         return beta
+
+    def mean(self):
+        mean = map(lambda x:statistics.mean(x), zip(*self.history))
+        return mean
+
+    def stddev(self):
+        stdev = map(lambda x:statistics.stdev(x), zip(*self.history))
+        return stdev
