@@ -1,3 +1,13 @@
+"""
+CS6238 - Secure Computer Systems
+Project Team: Kyle Koza and Anant Lummis
+
+Object Name: helpers.py
+Object Functions: long_to_bytes, read_2_lines, modular_lagrange_interpolation, mod_inverse, egcd
+Object Description:  The purpose of this object is to incapsulate several helper functions which did not belong in any of the
+                     main object classes.
+"""
+
 from binascii import unhexlify
 
 def long_to_bytes (val, endianness='big'):
@@ -34,6 +44,7 @@ def long_to_bytes (val, endianness='big'):
 
     return s
 
+#Function read_2_lines(f) reads in two lines at a time from the provided authentication file
 def read_2_lines(f):
     for line in f:
         try:
@@ -43,6 +54,9 @@ def read_2_lines(f):
 
         yield line[:-1], line2[:-1]
 
+#Function modular_lagrange_interpolation(x, points, prime) takes in an x value from a polynomial, several polynomial points, and a 
+#large prime number which are all used to perform the Lagrange interpolation function.  This should return a polynomial which can 
+#be evaluated to find the Hpwd.
 def modular_lagrange_interpolation(x, points, prime):
     # break the points up into lists of x and y values
     x_values, y_values = zip(*points)
@@ -64,6 +78,7 @@ def modular_lagrange_interpolation(x, points, prime):
         f_x += (y_values[i] * lagrange_polynomial) % prime
     return f_x % prime
 
+#Function mod_inverse(k, prime) takes in a large prime number and the value K and returns the mod inverse.
 def mod_inverse(k, prime):
     k = k % prime
     if k < 0:
@@ -72,6 +87,7 @@ def mod_inverse(k, prime):
         r = egcd(prime, k)[2]
     return (prime + r) % prime
 
+#Function egcd(a, b) computes the greatest common denominator between to integers a and b
 def egcd(a, b):
     if a == 0:
         return (b, 0, 1)

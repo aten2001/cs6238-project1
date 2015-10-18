@@ -1,3 +1,12 @@
+"""
+CS6238 - Secure Computer Systems
+Project Team: Kyle Koza and Anant Lummis
+
+Object Name: Config.py
+Object Functions: getConfig
+Object Description:  This function opens the configuration file located at config/default.conf and returns a ConfigParser object
+"""
+
 import os
 import ConfigParser
 
