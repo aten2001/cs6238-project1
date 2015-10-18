@@ -1,3 +1,14 @@
+"""
+CS6238 - Secure Computer Systems
+Project Team: Kyle Koza and Anant Lummis
+
+Object Name: InstructionTable.py
+Object Functions: generateTable, polynomial, genAlpha, genBeta, getMean, getStddev 
+Object Description:  The purpose of this object is to instantiate and manage an instruction table.  The purpose of the instruction
+                     table is to generate polynomial values which contstruct to form a polymial.  If the polynomial is contructed 
+                     appropriately based on typing features of the user, the polynomial can be evaluated to determing the Hpwd.
+"""
+
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes, hmac
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
@@ -9,7 +20,8 @@ import statistics
 config = Config.getConfig()
 
 class InstructionTable(object):
-
+    
+    #Object instantiation function which creates an instruction table object.
     def __init__(self, coefficients, q, password, salt, history):
         self.q = q
         self.coefficients = coefficients
@@ -17,6 +29,7 @@ class InstructionTable(object):
         self.salt = salt
         self.history = history
 
+    #Function generateTable() will generate an instruction table given the inputs provided during the object instantiation
     def generateTable(self):
         degree = config.get("general", "features")
         ti = config.get("general", "ti")
@@ -39,6 +52,7 @@ class InstructionTable(object):
                           beta])
         return table
 
+    #Function polynomial(base) will generate a polynomial given a base and the coefficients provided during object instantiation
     def polynomial(self, base):
         result = 0
         exponent = 0
@@ -47,6 +61,7 @@ class InstructionTable(object):
             exponent += 1
         return result
 
+    #Function genAlpha(i) will generate an alpha value to be included in the alpha column of an instruction table given the input i
     def genAlpha(self, i):
         backend = default_backend()
         kdf = PBKDF2HMAC(
@@ -63,6 +78,7 @@ class InstructionTable(object):
         alpha = y #+ G % self.q
         return alpha
 
+    #Function genBeta(i) will generate a beta value to be included in the beta column of an instruction table given the input i
     def genBeta(self, i):
         backend = default_backend()
         kdf = PBKDF2HMAC(
@@ -78,11 +94,13 @@ class InstructionTable(object):
         G = long(kdf.derive(self.password).encode('hex'),16)
         beta = y #+ G % self.q
         return beta
-
+    
+    #Function getMean() provides the mean across all columns of the history file provided during object instantiation
     def getMean(self):
         mean = map(lambda x:statistics.mean(x), zip(*self.history))
         return mean
 
+    #Function getStddev() provides the standard deviation across all columns of the history file provided during object instantiation
     def getStddev(self):
         stdev = map(lambda x:statistics.stdev(x), zip(*self.history))
         return stdev
