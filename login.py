@@ -130,10 +130,10 @@ if __name__ == "__main__":
                             # If hpwd doesn't work try next
                             continue
                 if login:
-                    print "Login successful"
+                    print 1
                     user.historyfile.addEntry(features)
                     storeUser(user)
                 else:
-                    print "Access denied"
+                    print 0
         else:
             print "Must specify login file name"
