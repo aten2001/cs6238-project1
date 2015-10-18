@@ -1,18 +1,13 @@
 # Build instructions
-## Python Modules
+## Required Python Modules
 argparse
-base64
-binascii
 collections
-ConfigParser
-Crypto
 cryptography
-getpass
-os
-pickle
 pycrypto
-shelve
 statistics
 
+## Install Python modules
+pip install -r requirements.txt
 
-
+## Run login program
+python login.py --file <inputfile>
