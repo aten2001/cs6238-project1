@@ -33,6 +33,11 @@ class User(object):
         self.password = password # TODO: hash this
         self.historyfile = self.getHistoryFile()
         self.polynomial = self.genPolynomial()
+        self.instructiontable = self.genInstructionTable()
+
+    # Function genInstructioTable() generates a new instruction table from
+    # locally stored variables
+    def genInstructionTable(self):
         self.instructiontable = InstructionTable.InstructionTable(
                                     self.polynomial,
                                     self.q,
