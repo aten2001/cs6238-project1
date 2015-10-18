@@ -30,9 +30,9 @@ class InstructionTable(object):
             alpha = self.genAlpha(i)
             beta = self.genBeta(i)
             if mean != None:
-                if abs(mean - int(ti)) > k * stdev:
+                if abs(mean[i] - int(ti)) > k * stdev[i]:
                     beta += Crypto.Random.random.randint(1, self.q) % self.q
-                elif abs(mean - int(ti)) < k * stdev:
+                elif abs(mean[i] - int(ti)) < k * stdev[i]:
                     alpha += Crypto.Random.random.randint(1, self.q) % self.q
             table.append([i,
                           alpha,
@@ -60,7 +60,7 @@ class InstructionTable(object):
         y = self.polynomial(2 * i)
 
         G = long(kdf.derive(self.password).encode('hex'),16)
-        alpha = y + G % self.q
+        alpha = y #+ G % self.q
         return alpha
 
     def genBeta(self, i):
@@ -76,7 +76,7 @@ class InstructionTable(object):
         y = self.polynomial(2 * i + 1)
 
         G = long(kdf.derive(self.password).encode('hex'),16)
-        beta = y + G % self.q
+        beta = y #+ G % self.q
         return beta
 
     def getMean(self):

@@ -56,13 +56,13 @@ def modular_lagrange_interpolation(x, points, prime):
             if i == j:
                 continue
             # compute a fraction & update the existing numerator + denominator
-            numerator = (numerator * (x - x_values[j])) % prime
-            denominator = (denominator * (x_values[i] - x_values[j])) % prime
+            numerator = (numerator * x_values[j]) % prime
+            denominator = denominator * pow((x_values[j] - x_values[i]), prime-2, prime)
         # get the polynomial from the numerator + denominator mod inverse
-        lagrange_polynomial = numerator * mod_inverse(denominator, prime)
+        lagrange_polynomial = numerator * denominator
         # multiply the current y & the evaluated polynomial & add it to f(x)
-        f_x = (prime + f_x + (y_values[i] * lagrange_polynomial)) % prime
-    return f_x
+        f_x += (y_values[i] * lagrange_polynomial) % prime
+    return f_x % prime
 
 def mod_inverse(k, prime):
     k = k % prime

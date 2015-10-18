@@ -26,10 +26,11 @@ def getParser():
 
     return parser
 
-def createUser(username=None):
+def createUser(username=None, password=None):
     if username == None:
         username = raw_input("Username: ")
-    password = getpass.getpass()
+    if password == None:
+        password = getpass.getpass()
     user = User.User(username, password)
 
     return user
