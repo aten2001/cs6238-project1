@@ -42,7 +42,6 @@ class HistoryFile(object):
             try:
                 self.history = self.decrypt(history)
             except cryptography.fernet.InvalidToken:
-                # TODO: raise error
                 raise PasswordError("Incorrect Password")
     
     #Function tokenFromPassword(), hashes the user password using the provided salt and the SHA256 hash function            
@@ -69,7 +68,8 @@ class HistoryFile(object):
     #Function encrypt(), takes the history file and encrypts the file using the Fernet symmetric key encryption algorithm and the token generated from Hpwd
     def encrypt(self):
         pickledQueue = pickle.dumps(self.history)
-        # TODO: pad queue
+        padLen = config.get("historyfile", "padlength")
+        pickledQueue += os.urandom(padLen - len(pickledQueue))
         fern = Fernet(self.token)
         cipher = fern.encrypt(pickledQueue)
         return cipher
