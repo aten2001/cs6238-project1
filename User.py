@@ -1,3 +1,12 @@
+"""
+CS6238 - Secure Computer Systems
+Project Team: Kyle Koza and Anant Lummis
+
+Object Name: User.py
+Object Functions: getHistoryFile, genPolynomial, deriveHpwd
+Object Description:  The purpose of this object is to instantiate and manage a user given a username and password.  
+"""
+
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes, hmac
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
@@ -15,6 +24,7 @@ BASE_PATH = os.path.dirname(os.path.realpath(__file__))
 
 class User(object):
 
+    #Initiate User object give inputs username and password
     def __init__(self, username, password):
         self.username = username
         self.q = Crypto.Util.number.getPrime(160)
@@ -29,19 +39,23 @@ class User(object):
                                     self.password,
                                     self.salt, self.historyfile.history)
 
+    #Function getHistoryFile(blob) takes in a history file if one is available and returns a valid history file
     def getHistoryFile(self, blob=None):
         if blob == None:
             return HistoryFile.HistoryFile(self.hpwd, self.salt)
         else:
             return HistoryFile.HistoryFile(self.hpwd, self.salt, history=blob)
 
+    #Function genPolynomial() accepts no inputs and will generate and return a polynomial which will be used 
     def genPolynomial(self):
         degree = int(config.get("general", "features")) - 1
         a = [self.hpwd]
         for i in range(0, degree):
             a.append(Crypto.Random.random.randint(1, self.q))
         return a
-
+    
+    #Function deriveHpwd(featureArray) accepts an array of typing features associated with a password and derives Hpwd from 
+    #the instruction table
     def deriveHpwd(self, featureArray):
         table = self.instructiontable.generateTable()
         backend = default_backend()
