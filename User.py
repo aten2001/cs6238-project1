@@ -38,11 +38,9 @@ class User(object):
     # Function genInstructioTable() generates a new instruction table from
     # locally stored variables
     def genInstructionTable(self):
-        self.instructiontable = InstructionTable.InstructionTable(
-                                    self.polynomial,
-                                    self.q,
-                                    self.password,
-                                    self.salt, self.historyfile.history)
+        return InstructionTable.InstructionTable(
+                self.polynomial, self.q, self.password,
+                self.salt, self.historyfile.history)
 
     #Function getHistoryFile(blob) takes in a history file if one is available and returns a valid history file
     def getHistoryFile(self, blob=None):
