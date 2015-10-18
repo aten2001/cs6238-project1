@@ -1,3 +1,13 @@
+"""
+CS6238 - Secure Computer Systems
+Project Team: Kyle Koza and Anant Lummis
+
+Object Name: login.py
+Object Functions: getParser, createUser, getUser, storeUser, main
+Object Description:  The login object is the primary object of the hardened password program.  The login function performs the 
+                     authentication of user and also manages user accounts.
+"""
+
 import User
 import helpers
 import argparse
@@ -13,6 +23,7 @@ BASE_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)),
                          "data")
 SHELF_FILE = os.path.join(BASE_PATH, "passwddb")
 
+#Function getParser() is part of the login program.
 def getParser():
     parser = argparse.ArgumentParser(description = "Login program for \
                                                     hardened password \
@@ -26,6 +37,7 @@ def getParser():
 
     return parser
 
+#Function createUser(Username) instantiates a user given a username and password
 def createUser(username=None):
     if username == None:
         username = raw_input("Username: ")
@@ -34,6 +46,7 @@ def createUser(username=None):
 
     return user
 
+#Function getUser(username) retrieves a user object given a username
 def getUser(username):
     shelf = shelve.open(SHELF_FILE)
 
@@ -46,6 +59,7 @@ def getUser(username):
     finally:
         shelf.close()
 
+#Function storeUser(user) manages the storage of the user object in file storage.
 def storeUser(user):
     shelf = shelve.open(SHELF_FILE, writeback=True)
 
@@ -58,6 +72,7 @@ def storeUser(user):
 
     shelf.close()
 
+#Function main() is the main function of the hardened password program
 if __name__ == "__main__":
     parser = getParser()
     args = parser.parse_args()
