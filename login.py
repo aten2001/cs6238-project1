@@ -69,6 +69,7 @@ def storeUser(user):
     hist = user.historyfile.encrypt()
     user.HistoryFile = None
     user.hpwd = None
+    user.password = None
     shelf["users"][user.username] = (pickle.dumps(user), hist)
 
     shelf.close()
@@ -99,17 +100,29 @@ if __name__ == "__main__":
                 if user == None:
                     user = createUser(args["user"])
                     storeUser(user)
-                if password != user.password:
-                    print "Password ({0}) does not match {1}".format(
-                            password, user.password)
-                    print 0
-                else:
-                    user.hpwd = user.deriveHpwd(features)
+                user.password = password
+                user.hpwd, hpwds = user.deriveHpwd(features)
+                login = False
+                try:
                     user.historyfile = user.getHistoryFile(enc_history)
                     login = True
-                    print "Password matches"
-                    if login:
-                        user.historyfile.addEntry(features)
-                        storeUser(user)
+                except PasswordError:
+                    # If decrypt fails try alternate hpwds
+                    for hpwd in hpwds:
+                        user.hpwd = hpwd
+                        try:
+                            user.historyfile = user.getHistoryFile(enc_history)
+                            # If decrypt succeeds, break and allow login
+                            login = True
+                            break
+                        except PasswordError:
+                            # If hpwd doesn't work try next
+                            continue
+                if login:
+                    print "Login successful"
+                    user.historyfile.addEntry(features)
+                    storeUser(user)
+                else:
+                    print "Access denied"
         else:
             print "Must specify login file name"
