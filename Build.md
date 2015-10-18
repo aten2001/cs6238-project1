@@ -1,8 +1,9 @@
 # Build instructions
 ## Required Python Modules
 argparse
-collections
 cryptography
+numpy
+scipy
 pycrypto
 statistics
 
