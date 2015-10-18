@@ -87,7 +87,7 @@ class User(object):
 
         i = 0
         for point in points:
-            errorcorrect[i] = point
+            errorcorrect.append(points)
             if point[0] % 2 == 0:
                 errorcorrect[i][0] = table[i][0] * 2 + 1
                 errorcorrect[i][1] = table[i][2] - G % self.q
