@@ -68,7 +68,7 @@ class HistoryFile(object):
     def encrypt(self):
         pickledQueue = pickle.dumps(self.history)
         padLen = config.get("historyfile", "padlength")
-        pickledQueue += os.urandom(padLen - len(pickledQueue))
+        pickledQueue += os.urandom(int(padLen) - len(pickledQueue))
         fern = Fernet(self.token)
         cipher = fern.encrypt(pickledQueue)
         return cipher

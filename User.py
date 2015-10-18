@@ -4,7 +4,7 @@ Project Team: Kyle Koza and Anant Lummis
 
 Object Name: User.py
 Object Functions: getHistoryFile, genPolynomial, deriveHpwd
-Object Description:  The purpose of this object is to instantiate and manage a user given a username and password.  
+Object Description:  The purpose of this object is to instantiate and manage a user given a username and password.
 """
 
 from cryptography.hazmat.backends import default_backend
@@ -33,11 +33,14 @@ class User(object):
         self.password = password # TODO: hash this
         self.historyfile = self.getHistoryFile()
         self.polynomial = self.genPolynomial()
-        self.instructiontable = InstructionTable.InstructionTable(
-                                    self.polynomial,
-                                    self.q,
-                                    self.password,
-                                    self.salt, self.historyfile.history)
+        self.instructiontable = self.genInstructionTable()
+
+    # Function genInstructioTable() generates a new instruction table from
+    # locally stored variables
+    def genInstructionTable(self):
+        return InstructionTable.InstructionTable(
+                self.polynomial, self.q, self.password,
+                self.salt, self.historyfile.history)
 
     #Function getHistoryFile(blob) takes in a history file if one is available and returns a valid history file
     def getHistoryFile(self, blob=None):
@@ -46,15 +49,15 @@ class User(object):
         else:
             return HistoryFile.HistoryFile(self.hpwd, self.salt, history=blob)
 
-    #Function genPolynomial() accepts no inputs and will generate and return a polynomial which will be used 
+    #Function genPolynomial() accepts no inputs and will generate and return a polynomial which will be used
     def genPolynomial(self):
         degree = int(config.get("general", "features")) - 1
         a = [self.hpwd]
         for i in range(0, degree):
             a.append(Crypto.Random.random.randint(1, self.q))
         return a
-    
-    #Function deriveHpwd(featureArray) accepts an array of typing features associated with a password and derives Hpwd from 
+
+    #Function deriveHpwd(featureArray) accepts an array of typing features associated with a password and derives Hpwd from
     #the instruction table
     def deriveHpwd(self, featureArray):
         table = self.instructiontable.generateTable()
@@ -71,6 +74,7 @@ class User(object):
 
         ti = int(config.get("general", "ti"))
         points = []
+        errorcorrect = []
         i = 0
         for feature in featureArray:
             if int(feature) < ti:
@@ -80,5 +84,23 @@ class User(object):
                 points.append([table[i][0] * 2 + 1,
                                table[i][2] - G % self.q])
             i += 1
+
+        i = 0
+        for point in points:
+            errorcorrect.append(points)
+            if point[0] % 2 == 0:
+                errorcorrect[i][0] = table[i][0] * 2 + 1
+                errorcorrect[i][1] = table[i][2] - G % self.q
+            else:
+                errorcorrect[i][0] = table[i][0] * 2
+                errorcorrect[i][1] = table[i][1] - G % self.q
+            i += 1
+
         hpwd = helpers.modular_lagrange_interpolation(0, points, self.q)
-        return hpwd
+
+        # Create an array with point arrays with one feature changed
+        hpwdAlternates = []
+        for points in errorcorrect:
+            hpwdAlternates.append(helpers.modular_lagrange_interpolation(0, points, self.q))
+
+        return hpwd, hpwdAlternates

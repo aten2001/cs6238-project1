@@ -16,6 +16,8 @@ import shelve
 import pickle
 import Config
 import os
+import Crypto.Util.number
+import Crypto.Random.random
 
 config = Config.getConfig()
 
@@ -23,7 +25,7 @@ BASE_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)),
                          "data")
 SHELF_FILE = os.path.join(BASE_PATH, "passwddb")
 
-#Function getParser() is part of the login program.
+#Function getParser() creates an argument parser.
 def getParser():
     parser = argparse.ArgumentParser(description = "Login program for \
                                                     hardened password \
@@ -66,9 +68,19 @@ def storeUser(user):
 
     if not shelf.has_key("users"):
         shelf["users"] = {}
+    # Encrypt the history file for storage
     hist = user.historyfile.encrypt()
+    # Pick a new 160bit prime
+    user.q = Crypto.Util.number.getPrime(160)
+    # Create a polynomial with f(0) = hpwd
+    user.polynomial = user.genPolynomial()
+    # Create an instruction table
+    user.instructiontable = user.genInstructionTable()
+    # Clear the historyfile, hpwd, and password in preparation
+    # for user storage
     user.HistoryFile = None
     user.hpwd = None
+    user.password = None
     shelf["users"][user.username] = (pickle.dumps(user), hist)
 
     shelf.close()
@@ -91,7 +103,7 @@ if __name__ == "__main__":
             with open(args["file"], "r") as f:
                 for password, features in helpers.read_2_lines(f):
                     logins.append((password, features))
-            # For each pw and feature array try to auth
+            # For each pw and feature array try to authenticate
             for login in logins:
                 password = login[0]
                 features = login[1].split(',')
@@ -99,17 +111,29 @@ if __name__ == "__main__":
                 if user == None:
                     user = createUser(args["user"])
                     storeUser(user)
-                if password != user.password:
-                    print "Password ({0}) does not match {1}".format(
-                            password, user.password)
-                    print 0
-                else:
-                    user.hpwd = user.deriveHpwd(features)
+                user.password = password
+                user.hpwd, hpwds = user.deriveHpwd(features)
+                login = False
+                try:
                     user.historyfile = user.getHistoryFile(enc_history)
                     login = True
-                    print "Password matches"
-                    if login:
-                        user.historyfile.addEntry(features)
-                        storeUser(user)
+                except PasswordError:
+                    # If decrypt fails try alternate hpwds
+                    for hpwd in hpwds:
+                        user.hpwd = hpwd
+                        try:
+                            user.historyfile = user.getHistoryFile(enc_history)
+                            # If decrypt succeeds, break and allow login
+                            login = True
+                            break
+                        except PasswordError:
+                            # If hpwd doesn't work try next
+                            continue
+                if login:
+                    print "Login successful"
+                    user.historyfile.addEntry(features)
+                    storeUser(user)
+                else:
+                    print "Access denied"
         else:
             print "Must specify login file name"
