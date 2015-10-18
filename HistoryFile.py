@@ -29,13 +29,12 @@ BASE_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)),
 config = Config.getConfig()
 
 class HistoryFile(object):
-    
     #Object initialization function.  Takes in the hardened password (Hpwd) and a hash function salt as inputs and instantiates the History file
     def __init__(self, password, salt, history=None):
         self.password = password
         self.salt = salt
         self.token = self.tokenFromPassword()
-        
+
         if history == None:
             self.history = deque([])
         else:
@@ -43,8 +42,8 @@ class HistoryFile(object):
                 self.history = self.decrypt(history)
             except cryptography.fernet.InvalidToken:
                 raise PasswordError("Incorrect Password")
-    
-    #Function tokenFromPassword(), hashes the user password using the provided salt and the SHA256 hash function            
+
+    #Function tokenFromPassword(), hashes the user password using the provided salt and the SHA256 hash function
     def tokenFromPassword(self):
         kdf = PBKDF2HMAC(
                 algorithm=hashes.SHA256(),
@@ -56,11 +55,11 @@ class HistoryFile(object):
         token = base64.urlsafe_b64encode(
                   kdf.derive(helpers.long_to_bytes(self.password)))
         return token
-        
+
     #Function addEntry(featureArray), accepts an instruction table array and appends it to the existing history file
     def addEntry(self, featureArray):
         length = config.get("historyfile", "length")
-        if len(self.history) >= length:     #If the history file is at maximum capacity, remove the oldest entry 
+        if len(self.history) >= length:     #If the history file is at maximum capacity, remove the oldest entry
             for i in range(0, (len(self.history) - length) + 1):
                 temp = self.history.popleft()
         self.history.append(featureArray)
@@ -73,7 +72,7 @@ class HistoryFile(object):
         fern = Fernet(self.token)
         cipher = fern.encrypt(pickledQueue)
         return cipher
-    
+
     #Function decrypt(), takes an encrypted history file and decrypts the file using the token generated from Hpwd
     def decrypt(self, history):
         fern = Fernet(self.token)
