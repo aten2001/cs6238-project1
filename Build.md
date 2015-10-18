@@ -1,5 +1,18 @@
 # Build instructions
 ## Python Modules
-pycrypto
+argparse
+base64
+binascii
+collections
+ConfigParser
+Crypto
 cryptography
+getpass
+os
+pickle
+pycrypto
+shelve
 statistics
+
+
+
