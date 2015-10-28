@@ -31,22 +31,26 @@ class InstructionTable(object):
 
     #Function generateTable() will generate an instruction table given the inputs provided during the object instantiation
     def generateTable(self):
-        degree = config.get("general", "features")
-        ti = config.get("general", "ti")
+        degree = int(config.get("general", "features"))
+        ti = int(config.get("general", "ti"))
+        k = int(config.get("crypto", "k"))
         table = []
         mean = None
         stdev = None
         if len(self.history) >= 5:
-            mean = getMean()
-            stdev = getStddev()
+            mean = self.getMean()
+            stdev = self.getStddev()
         for i in range(1, int(degree) + 1):
-            alpha = self.genAlpha(i)
-            beta = self.genBeta(i)
+            alpha = True 
+            beta = True
             if mean != None:
-                if abs(mean[i] - int(ti)) > k * stdev[i]:
-                    beta += Crypto.Random.random.randint(1, self.q) % self.q
-                elif abs(mean[i] - int(ti)) < k * stdev[i]:
-                    alpha += Crypto.Random.random.randint(1, self.q) % self.q
+                try:
+                    if abs(mean[i] - ti) > k * stdev[i]:
+                        beta = False
+                    elif abs(mean[i] - ti) < k * stdev[i]:
+                        alpha = False
+                except IndexError:
+                    pass
             table.append([i,
                           alpha,
                           beta])

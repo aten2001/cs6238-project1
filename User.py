@@ -61,16 +61,6 @@ class User(object):
     #the instruction table
     def deriveHpwd(self, featureArray):
         table = self.instructiontable.generateTable()
-        backend = default_backend()
-        kdf = PBKDF2HMAC(
-                algorithm=hashes.SHA256(),
-                length=32,
-                salt=self.salt,
-                iterations=100000,
-                backend=backend
-              )
-
-        G = long(kdf.derive(self.password).encode('hex'),16)
 
         ti = int(config.get("general", "ti"))
         points = []
@@ -78,29 +68,19 @@ class User(object):
         i = 0
         for feature in featureArray:
             if int(feature) < ti:
-                points.append([table[i][0] * 2,
-                               table[i][1] - G % self.q])
+                points.append(table[i][1])
             else:
-                points.append([table[i][0] * 2 + 1,
-                               table[i][2] - G % self.q])
+                points.append(table[i][2])
             i += 1
 
-        i = 0
+        hpwd = True
+        failcount = 0
         for point in points:
-            errorcorrect.append(points)
-            if point[0] % 2 == 0:
-                errorcorrect[i][0] = table[i][0] * 2 + 1
-                errorcorrect[i][1] = table[i][2] - G % self.q
-            else:
-                errorcorrect[i][0] = table[i][0] * 2
-                errorcorrect[i][1] = table[i][1] - G % self.q
-            i += 1
+            if not point:
+                failcount += 1
+            hpwd = hpwd and point
 
-        hpwd = helpers.modular_lagrange_interpolation(0, points, self.q)
+        if (not hpwd and (failcount <= 1)):
+            hpwd = True
 
-        # Create an array with point arrays with one feature changed
-        hpwdAlternates = []
-        for points in errorcorrect:
-            hpwdAlternates.append(helpers.modular_lagrange_interpolation(0, points, self.q))
-
-        return hpwd, hpwdAlternates
+        return hpwd
