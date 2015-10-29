@@ -67,7 +67,7 @@ class User(object):
         errorcorrect = []
         i = 0
         for feature in featureArray:
-            if int(feature) < ti:
+            if feature < ti:
                 points.append(table[i][1])
             else:
                 points.append(table[i][2])

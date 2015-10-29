@@ -79,8 +79,8 @@ def storeUser(user):
     # Clear the historyfile, hpwd, and password in preparation
     # for user storage
     user.HistoryFile = None
-    #user.hpwd = None
-    user.password = None
+    # user.hpwd = None
+    # user.password = None
     shelf["users"][user.username] = (pickle.dumps(user), hist)
 
     shelf.close()
@@ -102,7 +102,7 @@ if __name__ == "__main__":
         if args["file"]:
             with open(args["file"], "r") as f:
                 for password, features in helpers.read_2_lines(f):
-                    features = map(int, features.split(","))
+                    features = map(float, features.split(","))
                     logins.append((password, features))
             # For each pw and feature array try to authenticate
             for login in logins:
@@ -112,7 +112,9 @@ if __name__ == "__main__":
                 if user == None:
                     user = createUser(args["user"])
                     storeUser(user)
-                user.password = password
+                if password != user.password:
+                    print 0
+                    continue
                 login = user.deriveHpwd(features)
                 if login:
                     user.historyfile = user.getHistoryFile(enc_history)

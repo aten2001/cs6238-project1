@@ -40,15 +40,18 @@ class InstructionTable(object):
         if len(self.history) >= 5:
             mean = self.getMean()
             stdev = self.getStddev()
-        for i in range(1, int(degree) + 1):
+            # print "Mean: {0}".format(mean)
+            # print "Stddev: {0}".format(stdev)
+        for i in range(0, int(degree)):
             alpha = True 
             beta = True
             if mean != None:
                 try:
-                    if abs(mean[i] - ti) > k * stdev[i]:
-                        beta = False
-                    elif abs(mean[i] - ti) < k * stdev[i]:
-                        alpha = False
+                    if abs(mean[i] - ti) > (k * stdev[i]):
+                        if mean[i] < ti:
+                            beta = False
+                        else:
+                            alpha = False
                 except IndexError:
                     pass
             table.append([i,

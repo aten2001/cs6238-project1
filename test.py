@@ -35,9 +35,9 @@ def main():
 
     for feature in features:
       if feature < 10:
-        points.append([table[i][0] * 2,table[i][1]])
+        points.append([table[i][0],table[i][1]])
       else:
-        points.append([table[i][0] * 2 + 1, table[i][2]])
+        points.append([table[i][0], table[i][2]])
       i += 1
 
     print "Getting points from features {0}".format(features)
